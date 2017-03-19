@@ -16,12 +16,19 @@ In this project good driving habits are represented by staying always at the cen
 Inspired by this [blog post](https://chatbotslife.com/using-augmentation-to-mimic-human-driving-496b569760a9#.xgnblq2nv) I have tried an different approach. Instead of recording recovery maneuvers manually, it is probably better to augment the good data to create the wished behavior. To achieve this all images will be shifted with equal probability to the or to the right in a range of plus and minus 50 pixels. For every shift the steering in angle will be increased and decreased accordingly with a value of 0.4 at the maximum shift of 50 pixels.
 
 ![shift1](https://github.com/raiValek/CarND-Behavioral-Cloning-P3/blob/master/img/shift1.jpg)
+
 Angle Correction: -0.1673
+
 ![shift2](https://github.com/raiValek/CarND-Behavioral-Cloning-P3/blob/master/img/shift2.jpg)
+
 Angle Correction: -0.2283
+
 ![shift3](https://github.com/raiValek/CarND-Behavioral-Cloning-P3/blob/master/img/shift3.jpg)
+
 Angle Correction: 0.2404
+
 ![shift4](https://github.com/raiValek/CarND-Behavioral-Cloning-P3/blob/master/img/shift4.jpg)
+
 Angle Correction: 0.1216
 
 Another good side effect is to avoid the bias of driving staight. Since we are driving always in the center of the road, most of our steering angles will be near zero. Very small steering angles dominate the data.
@@ -36,9 +43,13 @@ By shifting every image ramdomly and changing the steering accordingly we get a 
 To deal with shadows an street surfaces with different color intensities, the brightness of each image will be randomly adjusted with a factor in a range between 0.3 and 1.3.
 
 Examples with changed brightness
+
 ![bright1](https://github.com/raiValek/CarND-Behavioral-Cloning-P3/blob/master/img/bright1.jpg)
+
 ![bright2](https://github.com/raiValek/CarND-Behavioral-Cloning-P3/blob/master/img/bright2.jpg)
+
 ![bright3](https://github.com/raiValek/CarND-Behavioral-Cloning-P3/blob/master/img/bright3.jpg)
+
 ![bright4](https://github.com/raiValek/CarND-Behavioral-Cloning-P3/blob/master/img/bright4.jpg)
 
 ### Using the side-view Cameras
@@ -48,8 +59,11 @@ Since we get images of three cameras in training mode but we use only the center
 Since the cameras does not see only the street but also the sky, the surroundings and the hood of the car, each image will be cropped. One reason for this is of course performance, training the model and predicting an angle goes much faster with smaller images. Another reason is not to confuse the CNN with unnecessary information. The goal is to get general driving model and the only parameter has to be the road in front of the car and not a lamp post next to a specific curve. Therefore the images will be cropped 64 px from above and 23 pixel from below.
 
 ![not_cropped](https://github.com/raiValek/CarND-Behavioral-Cloning-P3/blob/master/img/not_cropped.jpg)
+
 Original Image Size
+
 ![cropped](https://github.com/raiValek/CarND-Behavioral-Cloning-P3/blob/master/img/cropped.jpg)
+
 Cropped Image
 
 ### FLipping
@@ -57,7 +71,7 @@ Since the test track is rougly a circle one steering direction will dominate and
 
 ## Architecture
 My architecture consists of four convolutional layers with increasing number of filters, each followed by a RELU activation layer and a Maxpooling layer. The following for Fully Connected layers are seperated by Dropout layers to prevent overfitting, which is a perpetual danger in this project.
-
+```
 ____________________________________________________________________________________________________
 Layer (type)                     Output Shape          Param #     Connected to                     
 ====================================================================================================
@@ -113,5 +127,4 @@ Total params: 1,296,129
 Trainable params: 1,296,129
 Non-trainable params: 0
 ____________________________________________________________________________________________________
-
-
+```
