@@ -23,11 +23,11 @@ SHIFT4.jpg =>	0.1216
 
 Another good side effect is to avoid the bias of driving staight. Since we are driving always in the center of the road, most of our steering angles will be near zero. Very small steering angles dominate the data.
 
-HISTOGRAM
+![Angles in recorded Data][https://github.com/raiValek/CarND-Behavioral-Cloning-P3/blob/master/img/org_data.png]
 
 By shifting every image ramdomly and changing the steering accordingly we get a much bigger variaty of steering angles in the data.
 
-HISTOGRAM DANACH
+![Angles in after Augmentations][https://github.com/raiValek/CarND-Behavioral-Cloning-P3/blob/master/img/aug_data.png]
 
 ### Changing the Brightness
 To deal with shadows an street surfaces with different color intensities, the brightness of each image will be randomly adjusted with a factor in a range between 0.3 and 1.3.
