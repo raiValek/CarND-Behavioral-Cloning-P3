@@ -15,11 +15,14 @@ In this project good driving habits are represented by staying always at the cen
 ### Shifting Images
 Inspired by this [blog post](https://chatbotslife.com/using-augmentation-to-mimic-human-driving-496b569760a9#.xgnblq2nv) I have tried an different approach. Instead of recording recovery maneuvers manually, it is probably better to augment the good data to create the wished behavior. To achieve this all images will be shifted with equal probability to the or to the right in a range of plus and minus 50 pixels. For every shift the steering in angle will be increased and decreased accordingly with a value of 0.4 at the maximum shift of 50 pixels.
 
-img		corr
-SHIFT1.jpg =>	-0.1673
-SHIFT2.jpg =>	-0.2283
-SHIFT3.jpg =>	0.2404
-SHIFT4.jpg =>	0.1216
+![shift1](https://github.com/raiValek/CarND-Behavioral-Cloning-P3/blob/master/img/shift1.jpg)
+Angle Correction: -0.1673
+![shift2](https://github.com/raiValek/CarND-Behavioral-Cloning-P3/blob/master/img/shift2.jpg)
+Angle Correction: -0.2283
+![shift3](https://github.com/raiValek/CarND-Behavioral-Cloning-P3/blob/master/img/shift3.jpg)
+Angle Correction: 0.2404
+![shift4](https://github.com/raiValek/CarND-Behavioral-Cloning-P3/blob/master/img/shift4.jpg)
+Angle Correction: 0.1216
 
 Another good side effect is to avoid the bias of driving staight. Since we are driving always in the center of the road, most of our steering angles will be near zero. Very small steering angles dominate the data.
 
@@ -27,10 +30,16 @@ Another good side effect is to avoid the bias of driving staight. Since we are d
 
 By shifting every image ramdomly and changing the steering accordingly we get a much bigger variaty of steering angles in the data.
 
-![Angles in after Augmentations](https://github.com/raiValek/CarND-Behavioral-Cloning-P3/blob/master/img/aug_data.png)
+![Angles in after Augmentations](https://github.com/raiValek/CarND-Behavioral-Cloning-P3/blob/master/img/hist_aug_data.png)
 
 ### Changing the Brightness
 To deal with shadows an street surfaces with different color intensities, the brightness of each image will be randomly adjusted with a factor in a range between 0.3 and 1.3.
+
+Examples with changed brightness
+![bright1](https://github.com/raiValek/CarND-Behavioral-Cloning-P3/blob/master/img/bright1.jpg)
+![bright2](https://github.com/raiValek/CarND-Behavioral-Cloning-P3/blob/master/img/bright2.jpg)
+![bright3](https://github.com/raiValek/CarND-Behavioral-Cloning-P3/blob/master/img/bright3.jpg)
+![bright4](https://github.com/raiValek/CarND-Behavioral-Cloning-P3/blob/master/img/bright4.jpg)
 
 ### Using the side-view Cameras
 Since we get images of three cameras in training mode but we use only the center camera for autonomous driving, we can use the side-view cameras to increase the collected data by treating them like center camera images. If the image recorded by one of the side-view cameras would be the center, the car would be to far on the left or the right. So we have to add or subtract an specific factor from the current recorded angle to point the car to the center of the street again. This approach helps massively to center the car again. A correcting factor of 0.25 led to a good performance.
@@ -38,10 +47,71 @@ Since we get images of three cameras in training mode but we use only the center
 ### Cropping
 Since the cameras does not see only the street but also the sky, the surroundings and the hood of the car, each image will be cropped. One reason for this is of course performance, training the model and predicting an angle goes much faster with smaller images. Another reason is not to confuse the CNN with unnecessary information. The goal is to get general driving model and the only parameter has to be the road in front of the car and not a lamp post next to a specific curve. Therefore the images will be cropped 64 px from above and 23 pixel from below.
 
+![not_cropped](https://github.com/raiValek/CarND-Behavioral-Cloning-P3/blob/master/img/not_cropped.jpg)
+Original Image Size
+![cropped](https://github.com/raiValek/CarND-Behavioral-Cloning-P3/blob/master/img/cropped.jpg)
+Cropped Image
+
 ### FLipping
 Since the test track is rougly a circle one steering direction will dominate and bias the model. A simple approach to avoid this and to get even more training data, is by copying and flipping each data.
 
 ## Architecture
 My architecture consists of four convolutional layers with increasing number of filters, each followed by a RELU activation layer and a Maxpooling layer. The following for Fully Connected layers are seperated by Dropout layers to prevent overfitting, which is a perpetual danger in this project.
 
-ARCHITCTURE
+____________________________________________________________________________________________________
+Layer (type)                     Output Shape          Param #     Connected to                     
+====================================================================================================
+lambda_1 (Lambda)                (None, 64, 64, 3)     0           lambda_input_2[0][0]             
+____________________________________________________________________________________________________
+convolution2d_1 (Convolution2D)  (None, 64, 64, 16)    1216        lambda_1[0][0]                   
+____________________________________________________________________________________________________
+activation_1 (Activation)        (None, 64, 64, 16)    0           convolution2d_1[0][0]            
+____________________________________________________________________________________________________
+maxpooling2d_1 (MaxPooling2D)    (None, 32, 32, 16)    0           activation_1[0][0]               
+____________________________________________________________________________________________________
+convolution2d_2 (Convolution2D)  (None, 32, 32, 32)    4640        maxpooling2d_1[0][0]             
+____________________________________________________________________________________________________
+activation_2 (Activation)        (None, 32, 32, 32)    0           convolution2d_2[0][0]            
+____________________________________________________________________________________________________
+maxpooling2d_2 (MaxPooling2D)    (None, 16, 16, 32)    0           activation_2[0][0]               
+____________________________________________________________________________________________________
+convolution2d_3 (Convolution2D)  (None, 16, 16, 64)    18496       maxpooling2d_2[0][0]             
+____________________________________________________________________________________________________
+activation_3 (Activation)        (None, 16, 16, 64)    0           convolution2d_3[0][0]            
+____________________________________________________________________________________________________
+maxpooling2d_3 (MaxPooling2D)    (None, 8, 8, 64)      0           activation_3[0][0]               
+____________________________________________________________________________________________________
+convolution2d_4 (Convolution2D)  (None, 8, 8, 128)     73856       maxpooling2d_3[0][0]             
+____________________________________________________________________________________________________
+activation_4 (Activation)        (None, 8, 8, 128)     0           convolution2d_4[0][0]            
+____________________________________________________________________________________________________
+maxpooling2d_4 (MaxPooling2D)    (None, 4, 4, 128)     0           activation_4[0][0]               
+____________________________________________________________________________________________________
+flatten_1 (Flatten)              (None, 2048)          0           maxpooling2d_4[0][0]             
+____________________________________________________________________________________________________
+dropout_1 (Dropout)              (None, 2048)          0           flatten_1[0][0]                  
+____________________________________________________________________________________________________
+dense_1 (Dense)                  (None, 512)           1049088     dropout_1[0][0]                  
+____________________________________________________________________________________________________
+dropout_2 (Dropout)              (None, 512)           0           dense_1[0][0]                    
+____________________________________________________________________________________________________
+dense_2 (Dense)                  (None, 256)           131328      dropout_2[0][0]                  
+____________________________________________________________________________________________________
+dropout_3 (Dropout)              (None, 256)           0           dense_2[0][0]                    
+____________________________________________________________________________________________________
+dense_3 (Dense)                  (None, 64)            16448       dropout_3[0][0]                  
+____________________________________________________________________________________________________
+dropout_4 (Dropout)              (None, 64)            0           dense_3[0][0]                    
+____________________________________________________________________________________________________
+dense_4 (Dense)                  (None, 16)            1040        dropout_4[0][0]                  
+____________________________________________________________________________________________________
+dropout_5 (Dropout)              (None, 16)            0           dense_4[0][0]                    
+____________________________________________________________________________________________________
+dense_5 (Dense)                  (None, 1)             17          dropout_5[0][0]                  
+====================================================================================================
+Total params: 1,296,129
+Trainable params: 1,296,129
+Non-trainable params: 0
+____________________________________________________________________________________________________
+
+
