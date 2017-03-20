@@ -4,7 +4,7 @@ Udacity Self-Driving Car Nanodegree - Project 3 - Behavioral Cloning
 ## Introduction
 The objective of this project is to train a Convolutional Neural Network (CNN) in such a way, that it is able to drive a car on a test track autonomously. The training data can be obtained by driving the car manually on the test track and recording simultaneously images from three cameras on the front of the car as well as telemetry data like throttle, speed and the steering angle. For this purpose Udacity provides a simulator capable of recording training data and receiving data for autonomous driving.
 
-In this project we will focus on an end-to-end approach where the CNN will compute steering angles directly from the images of the center camera, without the use of the other cameras nor other telemetry data. However this data can be used for training purposes. A similar approach was used by NVIDIA in this article.
+In this project we will focus on an end-to-end approach where the CNN will compute steering angles directly from the images of the center camera, without the use of the other cameras nor other telemetry data. However this data can be used for training purposes. A similar approach was used by NVIDIA in this [article](http://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf).
 
 ## Collecting Training Data
 The simulator gives the option to drive the car by keyboard, mouse or game pad input. After some test laps with the keyboard, it became apparent that it is pretty hard to gather accurate data with this method. Since it is only possible to give binary commands with the arrow keys, the steering angles in a curve appeared to be scattered while it should rise and fall smoothly. Therefore I have used the analog stick of a Xbox 360 controller. High quality training data with good driving habits is obviously crucial for good training results, since the CNN will try to copy the behavior as good as it can.
@@ -31,11 +31,11 @@ Angle Correction: 0.2404
 
 Angle Correction: 0.1216
 
-Another good side effect is to avoid the bias of driving staight. Since we are driving always in the center of the road, most of our steering angles will be near zero. Very small steering angles dominate the data.
+Another nice side effect is that it weakens the overall tendency of driving straight. Since we are driving always in the center of the road, many of our steering angles will be near zero. Very small steering angles dominate the data.
 
 ![Angles in recorded Data](https://github.com/raiValek/CarND-Behavioral-Cloning-P3/blob/master/img/org_data.png)
 
-By shifting every image ramdomly and changing the steering accordingly we get a much bigger variaty of steering angles in the data.
+By shifting every image randomly and changing the steering accordingly we get a much bigger variety of steering angles in the data.
 
 ![Angles in after Augmentations](https://github.com/raiValek/CarND-Behavioral-Cloning-P3/blob/master/img/hist_aug_data.png)
 
@@ -66,11 +66,16 @@ Original Image Size
 
 Cropped Image
 
-### FLipping
-Since the test track is rougly a circle one steering direction will dominate and bias the model. A simple approach to avoid this and to get even more training data, is by copying and flipping each data.
+To make training and prediction faster, all images will be resized to 64 x 64 pixels. Also inspired by this [blog post](https://chatbotslife.com/using-augmentation-to-mimic-human-driving-496b569760a9#.xgnblq2nv).
+
+### Flipping
+Since the test track is roughly a circle one steering direction will dominate and bias the model. A simple approach to avoid this and to get even more training data, is by copying and flipping each data.
+
+### Final Data Set
+Overall, I have collected 4163 data points. With all three cameras, this will give us 12489 raw images and angles. The function `create_generator()` in line 112 returns a python generator which is yields chunks of the entire data to the optimizer. This function is also in charge of augmenting the original data. First, the data will be duplicated and flipped. Afterwards every image will be augmented in brightness, steering and image size. The data augmentation makes it possible to use the same data over and over again and still gather new information. In training, I let the generator run over all the data twice, giving me 49956 images. 10% of the images are used as validation set. Validation data will not be augmented except of flipping. 
 
 ## Architecture
-My architecture consists of four convolutional layers with increasing number of filters, each followed by a RELU activation layer and a Maxpooling layer. The following for Fully Connected layers are seperated by Dropout layers to prevent overfitting, which is a perpetual danger in this project.
+My architecture is more or less standard consisting of four convolutional layers with increasing number of filters, each followed by a RELU activation layer and a Maxpooling layer. Each convolution layer added more steadiness in the driving performance. The following four Fully Connected layers are separated by Dropout layers to prevent overfitting, which is a perpetual danger in this project. Since we do not want to assign the input data to a specific class, this is not a classification problem but a regression problem. Hence we do not need a SoftMax Activation in the end. The last linear classifier gives us a floating point number which is our predicted steering angle.
 ```
 ____________________________________________________________________________________________________
 Layer (type)                     Output Shape          Param #     Connected to                     
@@ -128,3 +133,9 @@ Trainable params: 1,296,129
 Non-trainable params: 0
 ____________________________________________________________________________________________________
 ```
+## Conclusion
+This project gave me a little insight to the tough work of making self driving cars reality. Although this approach is quite primitive, it was really hard to address, giving me weeks of work to come to the point described above. But beside all the continuous failures, I have learned a lot about Convolutional Neural Networks, which makes it all worth again. I'm really looking forward to solve the next problem.
+
+`Sucking at something is the first step towards being sorta good at something
+__Jake the Dog__`
+
