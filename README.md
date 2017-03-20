@@ -1,6 +1,15 @@
 # CarND-Behavioral-Cloning-P3
 Udacity Self-Driving Car Nanodegree - Project 3 - Behavioral Cloning
 
+## Content
+The following resources can be found in this github repository:
+
+* model.h5
+* drive.py
+* video.py
+* README.md
+* video.mp4
+
 ## Introduction
 The objective of this project is to train a Convolutional Neural Network (CNN) in such a way, that it is able to drive a car on a test track autonomously. The training data can be obtained by driving the car manually on the test track and recording simultaneously images from three cameras on the front of the car as well as telemetry data like throttle, speed and the steering angle. For this purpose Udacity provides a simulator capable of recording training data and receiving data for autonomous driving.
 
