@@ -136,7 +136,5 @@ ________________________________________________________________________________
 ## Conclusion
 This project gave me a little insight to the tough work of making self driving cars reality. Although this approach is quite primitive, it was really hard to address, giving me weeks of work to come to the point described above. But beside all the continuous failures, I have learned a lot about Convolutional Neural Networks, which makes it all worth again. I'm really looking forward to solve the next problem.
 
-_Sucking at something is the first step towards being sorta good at something_
-
-_Jake the Dog_
-
+>Sucking at something is the first step towards being sorta good at something
+>_-Jake the Dog-_
